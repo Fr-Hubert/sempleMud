@@ -1,3 +1,4 @@
+/* Copyright 2025 ZeroOne Ltd. All rights reserved. */
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 
@@ -13,3 +14,4 @@ function createWindow() {
 }
 
 app.whenReady().then(createWindow);
+
