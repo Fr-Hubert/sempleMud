@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MUD Game</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <h2>Simple MUD</h2>
+    <div id="log">
+      <div id="ascii">
+        &nbsp;&nbsp;&nbsp;&nbsp;i::;;;;;;;;;;;;;;;;;;;;;;;;;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|:.:.:.|&nbsp;:&nbsp;&nbsp;:.&nbsp;:|<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|::;;;;;;;;;;;;;;;;;;;;;;;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|:.:.:.!.&nbsp;:&nbsp;.&nbsp;:|,イ<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!:;;;;;;;;;;;;;;;;;;;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|:.:.:.|&nbsp;&nbsp;.:／/&nbsp;!<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i::;;;;;;;;;;;;;;;;;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,,-″ﾞﾞﾞﾞﾞ″''/&nbsp;&nbsp;|<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!:;;;;;;;;;;;;;;;;:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,,,r'..r''″″ゞ、ｌｌｌ&nbsp;ゞ<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|::;;;;;;;;;;;;,,-''''″″&nbsp;&nbsp;';::;ミ&nbsp;;;;,,&nbsp;〉&nbsp;&nbsp;&nbsp;.:ミ<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i::;;;:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.::ミ::...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.::ミ<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ﾚ':.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,&nbsp;'″″''-,,_&nbsp;&nbsp;&nbsp;てｌﾌ=====i~i=二二0<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ミ::.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ミ&nbsp;&nbsp;《ﾚｲ》&nbsp;&nbsp;)二ｰ'″&nbsp;tｭi三三iミ'″ゞ二二≡≡≡ﾆﾆﾆ二二二()<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ミ::.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;''″″ヽi&nbsp;i&nbsp;i&nbsp;j'＿ﾉﾉーi・⁻⁻二,ミ&nbsp;&nbsp;&nbsp;&nbsp;ミ---'<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ミ::&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;、&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;″'''″ミ￣ヽ&nbsp;&nbsp;
+        ｌ___,,″″″″'''''″<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;彡:.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ヽ:.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'″
+        ⌒ヽ::;;ヽ&nbsp;＼″'-,;&nbsp;.&nbsp;:&nbsp;.″''-,,_<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ﾍ:::..&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ﾉ::..&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.::;t-､_::ヽ&nbsp;&nbsp;&nbsp;＼:.″'-,,&nbsp;.&nbsp;:&nbsp;.&nbsp;:″''-<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/i,,-&nbsp;t&nbsp;-<;;;;、;;;;、,,､,､;;､;;;i___ゝ&nbsp;::;;ヽ&nbsp;&nbsp;＼:.:.:″'-,,.:.<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;
+        ﾞ''ｰ-ﾞｰ''';;;;;;;;;;;;;;;;;;;;;;;;;;;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::;;;;;&nbsp;ヽ&nbsp;＼:.:.:″'-,,:<br />
+        &nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.::;;;;;;;;;;;;;;;;;;;;;;;;;;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::;;;;;&nbsp;ヽ&nbsp;&nbsp;&nbsp;＼:.:.:.:.:<br />
+        /&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;....::;;;;;;;;;;;;;;;;;;;;;;;;;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::;;;;;&nbsp;ヽ&nbsp;&nbsp;&nbsp;＼:.:.:.<br />
+      </div>
+    </div>
+    <input id="cmd" placeholder="명령어 입력창" autofocus />
+
+    <script>
+      const log = document.getElementById("log");
+      const cmd = document.getElementById("cmd");
+
+      const world = {
+        집: {
+          desc: "집 입니다. 북쪽으로 작은 마을이 보입니다.",
+          exits: { 나가기: "마을" },
+        },
+        마을: {
+          desc: "작은 마을입니다. 집으로 돌아갈 수 있습니다.",
+          exits: { 집: "집" },
+        },
+      };
+      /*
+      const position = {
+        평민: { 평민 },
+        무직: { 무직 },
+      };*/
+
+      const state = {
+        room: "집", // 초기 방을 world.json과 맞춤
+        닉네임: "테스터",
+        레벨: 100,
+        경험치: 99999,
+        신분: "평민",
+        직업: "무직",
+        계급: "-",
+      };
+
+      const attribute = {
+        체력: 5000,
+        힘: 1000,
+        민첩: 1000,
+        지능: 145,
+        위엄: 10000,
+      };
+
+      const inventory = {
+        골드: 1000000,
+        아이템: ["M16", "M1911", "도시락"],
+      };
+
+      const history = [];
+      let historyIndex = -1;
+
+      function print(msg) {
+        log.innerHTML += `<div>&nbsp;&nbsp;${msg}</div>`;
+        log.scrollTop = log.scrollHeight;
+      }
+
+      const commands = {
+        도움말: () =>
+          print(
+            "사용 가능한 명령어: 현위치, 이동 <방향>, 상태, 능력, 인벤토리"
+          ),
+        현위치: () => {
+          const room = world[state.room];
+          if (!room)
+            return print(
+              '<span class="warn">현재 방 정보를 찾을 수 없습니다.</span>'
+            );
+          print(`당신은 <span class="room">${state.room}</span>&nbsp;입니다.`);
+          print(`${room.desc}`);
+          print(`출구: ${Object.keys(room.exits).join(", ")}`);
+        },
+        이동: (dir) => {
+          if (!dir)
+            return print('<span class="warn">이동 방향을 입력하세요.</span>');
+          const room = world[state.room];
+          const next = room.exits[dir];
+          if (next) {
+            state.room = next;
+            print(
+              `<span class="room">${dir}</span>(으)로 이동 → 현재 위치: <span class="room">${next}</span>`
+            );
+            print(world[next].desc);
+          } else {
+            print(
+              '<span class="warn">그 방향으로는 이동할 수 없습니다.</span>'
+            );
+          }
+        },
+        상태: () => {
+          print("===== 상태창 =====");
+          for (const [k, v] of Object.entries(state)) print(`${k}: ${v}`);
+        },
+        능력: () => {
+          print("===== 능력치 =====");
+          for (const [k, v] of Object.entries(attribute)) print(`${k}: ${v}`);
+        },
+        인벤토리: () => {
+          print("===== 인벤토리 =====");
+          print(`골드: ${inventory.골드}`);
+          print(`아이템: ${inventory.아이템.join(", ")}`);
+        },
+      };
+
+      function handleCommand(input) {
+        if (!input.trim()) return;
+
+        history.push(input);
+        historyIndex = history.length;
+
+        const args = input.trim().split(" ");
+        const action = args[0]; // 한국어 그대로 사용
+        const now = new Date();
+        const timestamp = `<${now.getFullYear()}/${String(
+          now.getMonth() + 1
+        ).padStart(2, "0")}/${String(now.getDate()).padStart(2, "0")}/${String(
+          now.getHours()
+        ).padStart(2, "0")}:${String(now.getMinutes()).padStart(
+          2,
+          "0"
+        )}:${String(now.getSeconds()).padStart(2, "0")}>`;
+        print(`<br>${timestamp} <span style="color:yellow">${input}</span>`);
+
+        if (commands[action]) {
+          commands[action](...args.slice(1));
+        } else {
+          print('<span class="warn">존재하지 않는 명령어입니다.</span>');
+          print("도움말을 쳐서 사용 가능한 명령어를 확인하세요.");
+        }
+      }
+
+      cmd.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          handleCommand(cmd.value);
+          cmd.value = "";
+        } else if (e.key === "ArrowUp") {
+          if (historyIndex > 0) cmd.value = history[--historyIndex];
+          e.preventDefault();
+        } else if (e.key === "ArrowDown") {
+          if (historyIndex < history.length - 1)
+            cmd.value = history[++historyIndex];
+          else {
+            historyIndex = history.length;
+            cmd.value = "";
+          }
+          e.preventDefault();
+        }
+      });
+      print("Welcome to Simple MUD!");
+      print("도움말을 쳐서 사용 가능한 명령어를 확인하세요.");
+      //print(world[state.room].desc);
+    </script>
+  </body>
+</html>
